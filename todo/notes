@@ -1,0 +1,208 @@
+------
+npm init
+------
+npm install express —-save
+------
+ npm install babel-cli --save
+Babel helps to turn our codes from ES6 to ES5.some ES6 features that our browsers and node are yet to understand, and older browsers do not understand ES6 codes.
+------
+npm install babel-preset-es2015 --save
+the presets contains a set of plugins, these plugins are for ES6 features, by installing and configuring babel-preset-es2015 we tell babel to convert any ES6 feature we use that are contained in the preset to their ES5 equivalent.
+------
+.babelrc : set babel to use the es2015 preset 
+{  
+   "presets": ["es2015"]
+}
+------
+ES2015 is another name for ES6.
+------
+Dummy DB:
+const todos = [
+  {
+    id: 1,
+    title: "lunch",
+    description: "go for lunc by 2 pm"
+  }
+];
+
+export default todos;
+
+------
+basics app.js file
+import express from "express";
+import db from "./db/db";
+
+//set up the express app
+const app = express();
+
+//get all todos
+app.get("/api/v1/todos", (req, res) => {
+  res.status(200).send({
+    success: "true",
+    message: "todos retrieved successully",
+    todos: db
+  });
+});
+
+const PORT = 5000;
+
+app.listen(PORT, () => {
+  console.log(`server running on port ${PORT}`);
+});
+
+------
+app.get makes a get request to the server with the route/endpoint provided as the first parameter, the endpoint is meant to return all the todos in the database.
+
+The second parameter is a function that runs every time we hit that endpoint. the function takes two parameters which are req and res. The req object contains information about our request and the response object contains information about the response and methods we can use to send information back to the client.
+
+res.status(200) is used to send back the status of the request, 200 means ok and it indicates a successful request.
+
+res.send() is used to send back a response to the client, the resource passed into the send as a parameter is what gets sent back to the client.we send back an object which contains some information.
+
+app.listen creates a web server for us, it takes two parameters, : 
+1. the first parameter is the port we want our application to listen
+2. the second parameter is optional, it is a callback function of what should happen when the server gets created, in our case we are logging a message to the console.
+
+localhost:5000/api/v1/todos
+------
+run it with babel-node which will compile it to ES5. babel-node comes with the babel-cli
+------
+node_modules/.bin/babel-node app.js
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
+------
+
