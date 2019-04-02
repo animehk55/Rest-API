@@ -1,3 +1,4 @@
+https://medium.com/@purposenigeria/build-a-restful-api-with-node-js-and-express-js-d7e59c7a3dfb
 ------
 npm init
 ------
@@ -71,23 +72,277 @@ node_modules/.bin/babel-node app.js
 ------
 Nodemon watches your app for file changes and restarts the server every time a file changes in your app.
 ------
+body-parser parses incoming request bodies in a middleware before your handlers, available under the req.bodyproperty.
+------
+body parser does is that it parses this JSON data and makes it available under the req.body as a property.
+------
+update todo  : 
+app.put('/api/v1/todos/:id', (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  let todoFound;
+  let itemIndex;
+  db.map((todo, index) => {
+    if (todo.id === id) {
+      todoFound = todo;
+      itemIndex = index;
+    }
+  });
+
+  if (!todoFound) {
+    return res.status(404).send({
+      success: 'false',
+      message: 'todo not found',
+    });
+  }
+
+  if (!req.body.title) {
+    return res.status(400).send({
+      success: 'false',
+      message: 'title is required',
+    });
+  } else if (!req.body.description) {
+    return res.status(400).send({
+      success: 'false',
+      message: 'description is required',
+    });
+  }
+
+  const updatedTodo = {
+    id: todoFound.id,
+    title: req.body.title || todoFound.title,
+    description: req.body.description || todoFound.description,
+  };
+
+  db.splice(itemIndex, 1, updatedTodo);
+
+  return res.status(201).send({
+    success: 'true',
+    message: 'todo added successfully',
+    updatedTodo,
+  });
+});
+------
+db.splice to remove the old todo that match our iteration when we looped through the dummy db and replace it with the updatedTodo that we created.
+------
+Middleware functions are functions that have access to the request object (req), the response object (res), and the next middleware function in the application’s request-response cycle. The next middleware function is commonly denoted by a variable named next.
+------
+import express from 'express';
+import db from '../db/db';
+
+const router = express.Router();
+------
+/* eslint-disable class-methods-use-this */
+import db from '../db/db';
+
+class TodosController {
+  getAllTodos(req, res) {
+    return res.status(200).send({
+      success: 'true',
+      message: 'todos retrieved successfully',
+      todos: db,
+    });
+  }
+
+  getTodo(req, res) {
+    const id = parseInt(req.params.id, 10);
+    db.map((todo) => {
+      if (todo.id === id) {
+        return res.status(200).send({
+          success: 'true',
+          message: 'todo retrieved successfully',
+          todo,
+        });
+      }
+    });
+    return res.status(404).send({
+      success: 'false',
+      message: 'todo does not exist',
+    });
+  }
+
+  createTodo(req, res) {
+    if (!req.body.title) {
+      return res.status(400).send({
+        success: 'false',
+        message: 'title is required',
+      });
+    } else if (!req.body.description) {
+      return res.status(400).send({
+        success: 'false',
+        message: 'description is required',
+      });
+    }
+    const todo = {
+      id: db.length + 1,
+      title: req.body.title,
+      description: req.body.description,
+    };
+    db.push(todo);
+    return res.status(201).send({
+      success: 'true',
+      message: 'todo added successfully',
+      todo,
+    });
+  }
+
+  updateTodo(req, res) {
+    const id = parseInt(req.params.id, 10);
+    let todoFound;
+    let itemIndex;
+    db.map((todo, index) => {
+      if (todo.id === id) {
+        todoFound = todo;
+        itemIndex = index;
+      }
+    });
+
+    if (!todoFound) {
+      return res.status(404).send({
+        success: 'false',
+        message: 'todo not found',
+      });
+    }
+
+    if (!req.body.title) {
+      return res.status(400).send({
+        success: 'false',
+        message: 'title is required',
+      });
+    } else if (!req.body.description) {
+      return res.status(400).send({
+        success: 'false',
+        message: 'description is required',
+      });
+    }
+
+    const newTodo = {
+      id: todoFound.id,
+      title: req.body.title || todoFound.title,
+      description: req.body.description || todoFound.description,
+    };
+
+    db.splice(itemIndex, 1, newTodo);
+
+    return res.status(201).send({
+      success: 'true',
+      message: 'todo added successfully',
+      newTodo,
+    });
+  }
+
+  deleteTodo(req, res) {
+    const id = parseInt(req.params.id, 10);
+    let todoFound;
+    let itemIndex;
+    db.map((todo, index) => {
+      if (todo.id === id) {
+        todoFound = todo;
+        itemIndex = index;
+      }
+    });
+
+    if (!todoFound) {
+      return res.status(404).send({
+        success: 'false',
+        message: 'todo not found',
+      });
+    }
+    db.splice(itemIndex, 1);
+
+    return res.status(200).send({
+      success: 'true',
+      message: 'Todo deleted successfuly',
+    });
+  }
+}
+
+const todoController = new TodosController();
+export default todoController;
+------
+controller 
+import express from 'express';
+import TodoController from '../todosController/todos';
+
+const router = express.Router();
+
+router.get('/api/v1/todos', TodoController.getAllTodos);
+router.get('/api/v1/todos/:id', TodoController.getTodo);
+router.post('/api/v1/todos', TodoController.createTodo);
+router.put('/api/v1/todos/:id', TodoController.updateTodo);
+router.delete('/api/v1/todos/:id', TodoController.deleteTodo);
+
+export default router;
 
 ------
-
-------
-
-------
-
-------
-
-------
-
-------
-
-------
-
-------
-
+HTTP Status Codes
+1×× Informational
+100 Continue
+101 Switching Protocols
+102 Processing
+2×× Success
+200 OK
+201 Created
+202 Accepted
+203 Non-authoritative Information
+204 No Content
+205 Reset Content
+206 Partial Content
+207 Multi-Status
+208 Already Reported
+226 IM Used
+3×× Redirection
+300 Multiple Choices
+301 Moved Permanently
+302 Found
+303 See Other
+304 Not Modified
+305 Use Proxy
+307 Temporary Redirect
+308 Permanent Redirect
+4×× Client Error
+400 Bad Request
+401 Unauthorized
+402 Payment Required
+403 Forbidden
+404 Not Found
+405 Method Not Allowed
+406 Not Acceptable
+407 Proxy Authentication Required
+408 Request Timeout
+409 Conflict
+410 Gone
+411 Length Required
+412 Precondition Failed
+413 Payload Too Large
+414 Request-URI Too Long
+415 Unsupported Media Type
+416 Requested Range Not Satisfiable
+417 Expectation Failed
+418 I'm a teapot
+421 Misdirected Request
+422 Unprocessable Entity
+423 Locked
+424 Failed Dependency
+426 Upgrade Required
+428 Precondition Required
+429 Too Many Requests
+431 Request Header Fields Too Large
+444 Connection Closed Without Response
+451 Unavailable For Legal Reasons
+499 Client Closed Request
+5×× Server Error
+500 Internal Server Error
+501 Not Implemented
+502 Bad Gateway
+503 Service Unavailable
+504 Gateway Timeout
+505 HTTP Version Not Supported
+506 Variant Also Negotiates
+507 Insufficient Storage
+508 Loop Detected
+510 Not Extended
+511 Network Authentication Required
+599 Network Connect Timeout Error
 ------
 
 ------
